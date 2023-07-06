@@ -7,3 +7,4 @@ compile.bat
 Makefile
 
 old_src
+cmake-build-debug
