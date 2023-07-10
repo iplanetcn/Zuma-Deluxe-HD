@@ -65,7 +65,7 @@ static int _LoadResources(void) {
 
 
 static int _ShowStartupImage(void) {
-    HQC_Texture texDisclaimer = HQC_Artist_LoadTexture("images\\disclaimer.jpg");
+    HQC_Texture texDisclaimer = HQC_Artist_LoadTexture("images/disclaimer.jpg");
     
     HQC_Artist_DrawTexture(texDisclaimer, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
     HQC_Artist_Display();

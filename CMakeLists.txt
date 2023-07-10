@@ -6,7 +6,9 @@ project(
 )
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
 
+# Download bass & bass-fx libraries for windows
 if (WIN32)
     find_library (Bass bass NO_CACHE PATHS ${PROJECT_SOURCE_DIR}/lib/bass/c/x64)
     if (${Bass} STREQUAL Bass-NOTFOUND)
@@ -24,6 +26,7 @@ if (WIN32)
     endif()
 endif()
 
+# Download bass & bass-fx libraries for macOSX
 if (APPLE)
     find_library(isBassFound bass NO_CACHE PATHS ${PROJECT_SOURCE_DIR}/lib/bass)
     if(${isBassFound} STREQUAL isBassFound-NOTFOUND)
@@ -44,6 +47,7 @@ endif()
 
 include(FetchContent)
 
+# Fetching expat
 message("Fetching expat")
 FetchContent_Declare(
     expat
@@ -57,6 +61,8 @@ set(EXPAT_BUILD_DOCS OFF)
 set(EXPAT_BUILD_TOOLS OFF)
 add_subdirectory(${expat_SOURCE_DIR}/expat ${expat_BINARY_DIR})
 
+# Fetching SDL2 libraries
+if (WIN32)
 message("Fetching sdl2")
 FetchContent_Declare(
     sdl2
@@ -84,6 +90,13 @@ FetchContent_Declare(
 )
 set(SDL2TTF_SAMPLES OFF)
 FetchContent_MakeAvailable(sdl2_ttf)
+endif ()
+
+if (APPLE)
+find_package(SDL2 REQUIRED)
+find_package(SDL2_image REQUIRED)
+find_package(SDL2_ttf REQUIRED)
+endif ()
 
 FILE(GLOB_RECURSE SOURCES RELATIVE ${PROJECT_SOURCE_DIR} "src/*.c")
 
@@ -110,6 +123,8 @@ link_directories(
     ${PROJECT_SOURCE_DIR}/lib/bass-fx/
 )
 
+if (Win32)
+
 target_link_libraries(
     ${PROJECT_NAME} PRIVATE
     SDL2
@@ -119,9 +134,26 @@ target_link_libraries(
 
     ${PROJECT_SOURCE_DIR}/lib/bass/libbass.dylib
     ${PROJECT_SOURCE_DIR}/lib/bass-fx/libbass_fx.dylib
-    
+
     expat
 )
+endif ()
+
+if (APPLE)
+    target_link_libraries(
+            ${PROJECT_NAME} PRIVATE
+            SDL2::Core
+            SDL2::Main
+            SDL2::Image
+            SDL2::TTF
+
+            ${PROJECT_SOURCE_DIR}/lib/bass/libbass.dylib
+            ${PROJECT_SOURCE_DIR}/lib/bass-fx/libbass_fx.dylib
+
+            expat
+    )
+endif ()
+
 
 message(STATUS ${Bass})
 message(STATUS ${BassFx})
